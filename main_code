@@ -1,19 +1,25 @@
-from funções_cadastro import cadastrar, menu, cadastro, programa, alterar_idade, alterar_nome, exibir_lista
 
+try:
+    from funcões_cadastro import cadastrar, menu, cadastro, programa, alterar_idade, alterar_nome, exibir_lista, deletar_usuario
 
-while True:
-    x = menu()
-    if x == 1:
-        cadastrar()
-    elif x == 2:
-        alterar_idade()
-    elif x == 3:
-        alterar_nome()
-    elif x == 4:
-        exibir_lista()
-    elif x == 0:
-        print()
-        print('OBRIGADO POR UTILIZAR NOSSOS SERVIÇOS !! VOLTE SEMPRE !!')
-        break
-    else:
-        menu()
+    while True:
+
+        x = menu()
+        if x == 1:
+            cadastrar()
+        elif x == 2:
+            alterar_idade()
+        elif x == 3:
+            alterar_nome()
+        elif x == 4:
+            exibir_lista()
+        elif x == 5:
+            deletar_usuario()
+        elif x == 0:
+            print()
+            print('OBRIGADO POR UTILIZAR NOSSOS SERVIÇOS !! VOLTE SEMPRE !!')
+            break
+        else:
+            menu()
+except ImportError as erro:
+    print(erro)
