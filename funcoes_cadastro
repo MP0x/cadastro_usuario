@@ -1,21 +1,16 @@
 import os
 import platform
+from conecta_db import mydb
+from datetime import date
+
+
+mycursor = mydb.cursor()
+mycursor.execute('create database if not exists cadastro_usuario')
+mycursor.execute('use cadastro_usuario')
+mycursor.execute('create table if not exists usuarios  (id int primary key auto_increment, '
+                 'nome varchar(30) not null, idade int(3) not null)')
 
 try:
-    import mysql.connector
-    from conecta_db import mydb
-    from datetime import date
-
-
-    cadastro = {}
-    programa = []
-    mycursor = mydb.cursor()
-
-    mycursor.execute('create database if not exists Cadastro_Usuario')
-    mycursor.execute('use Cadastro_Usuario')
-    mycursor.execute('create table if not exists usuarios  (id int primary key auto_increment, '
-                     'nome varchar(30) not null, idade int(3) not null)'
-                     )
 
     #myresult = mycursor.fetchall()
     #print(myresult)
@@ -178,5 +173,3 @@ try:
 
 except ImportError as erro:
     print(erro)
-
-
