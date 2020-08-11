@@ -1,12 +1,8 @@
 import mysql.connector
-import time
 
 a = True
 print("Tentando acesso ao banco de dados: ", end='')
 while a:
-    #time.sleep(0.005)
-
-
     try:
         mydb = mysql.connector.connect(
           host="127.0.0.1",
@@ -21,6 +17,8 @@ while a:
         #print("Tentando conectar no banco.")
 
         print("*", end='')
+
+
 
 
 #Executa as linhas no SQL
