@@ -1,11 +1,14 @@
-
 try:
+    import mp3fundo
     from funcoes_cadastro import cadastrar, menu, alterar_idade, alterar_nome, exibir_lista, deletar_usuario
     from funcoes_login import consulta_usuario
-
-
+    from time import sleep
+    import os
+    os.system('color a')
+    os.system('cls')
     while consulta_usuario() == True:
-
+        sleep(0.15)
+        os.system('cls')
         while True:
             x = menu()
             if x == 1:
