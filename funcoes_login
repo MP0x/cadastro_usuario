@@ -1,6 +1,9 @@
 import mysql.connector
 from conecta_db import mydb
-
+import os
+import smtplib
+import sys
+from time import sleep
 
 mycursor = mydb.cursor()
 
@@ -11,7 +14,7 @@ mycursor.execute('use cadastro_usuario')
 mycursor.execute('create table if not exists login  (usuario varchar(20) primary key, '
                  'senha varchar(20) not null, email varchar(55) not null)')
 
-def verificar_usuario(usuario, senha):
+def verificar_acesso(usuario, senha):
     mycursor = mydb.cursor()
     sql = "select * from login WHERE usuario = %s and senha = %s"
     val = (usuario, senha)
@@ -24,33 +27,129 @@ def verificar_usuario(usuario, senha):
     else:
         return False
 
+def verificar_usuario(usuario):
+    mycursor = mydb.cursor()
+    sql = "select * from login WHERE usuario = %s"
+    val = (usuario,)
+    mycursor.execute(sql, val)
+    # mycursor.execute(f'select usuario from login where usuario = {usuario} ')
+    mycursor.fetchall()
+    rc = mycursor.rowcount
+    if rc == 1:
+        return True
 
+    else:
+        return False
+
+def cadastrar_usuario():
+    try:
+        print()
+        usuario = input('Digite o nome do usuário: '.title().strip())
+        if verificar_usuario(usuario) == False:
+            b = True
+            while b:
+                email = input('Digite o seu email: ').strip()
+
+                if '@' in str(email):
+                    b = False
+                else:
+                    print('Isso não é um Email.')
+                    print('Digite um email válido !!')
+
+            a = True
+            while a:
+                senha1 = input('Digite a senha: '.title().strip())
+
+                if len(senha1) < 8:
+                    print('DIGITE UMA SENHA COM NO MINIMO 8 CARACTERES.')
+                else:
+                    senha2 = input('Digite novamente a senha: '.title().strip())
+
+                    if senha1 == senha2:
+                        sql = "INSERT INTO login (usuario, senha, email) VALUES (%s, %s, %s)"
+                        val = (usuario, senha1, email)
+                        mycursor.execute(sql, val)
+                        mydb.commit()
+                        os.system('cls')
+                        print('Usuario Cadastrado com Sucesso !!')
+                        a = False
+                    else:
+                        print('Suas senhas estão diferentes !! ')
+                        print('Digite novamente a senha !')
+
+        else:
+            print('Usuario já existe em nosso Banco de Dados !!')
+            print('Favor digitar novamente.')
+            cadastrar_usuario()
+        consulta_usuario()
+    except ValueError as erro:
+        print("Digite um valor valido.")
+        cadastrar_usuario()
+
+def lembrar_senha(usuario, email):
+    mycursor = mydb.cursor()
+    sql = "select * from login WHERE usuario = %s and email = %s"
+    val = (usuario, email)
+    mycursor.execute(sql, val)
+    # mycursor.execute(f'select usuario from login where usuario = {usuario} and email = {email} ')
+    mycursor.fetchall()
+    rc = mycursor.rowcount
+    if rc == 1:
+        return True
+    else:
+        return False
 
 def consulta_usuario():
 
     mycursor = mydb.cursor()
     mycursor.execute('use cadastro_usuario')
+    while True:
+        print('='*50)
+        print('BEM VINDO AO SISTEMA'.center(50))
+        print('='*50)
 
-    print('='*50)
-    print('BEM VINDO AO SISTEMA'.center(50))
-    print('='*50)
+        opt = int(input(
+            '''         DIGITE A OPÇÃO DESEJADA:
+            [1] -> Acesso ao Banco de Dados.
+            [2] -> Cadastrar Usuario e Senha.
+            [3] -> Esqueci Minha Senha.
+            [4] -> Sair. 
+            ->   ''' ))
 
-    opt = int(input(
-        '''         DIGITE A OPÇÃO DESEJADA:
-        [1] -> Acesso ao Banco de Dados.
-        [2] -> Cadastrar Usuario e Senha.
-        [3] -> Lembrar Senha.
-        [4] -> Sair 
-        ->   ''' ))
+        if opt == 1:
+            usuario = input('Digite o seu usuario [letra minuscula]: ').strip().lower()
+            senha = input('Digite a sua senha: ').strip()
+            if verificar_acesso(usuario, senha) == True:
+                os.system('cls')
+                print('               Acesso Concedido !!')
 
-    if opt == 1:
-        usuario = input('Digite o seu usuario [letra minuscula]: ').strip().lower()
-        senha = input('Digite a sua senha: ').strip()
-        resp = verificar_usuario(usuario, senha)
-        if resp == True:
-            return True
-        else:
-            print('Digite um usuario cadastrado!')
-            consulta_usuario()
-    elif opt == 2:
-        pass
+                return True
+            else:
+                print('Digite um usuario cadastrado!')
+                verificar_acesso()
+        elif opt == 2:
+            cadastrar_usuario()
+        elif opt == 3:
+            y = True
+            while y:
+                usuario = input('Digite o seu usuario cadastrado [letra minuscula]: ').strip().lower()
+                email = input('Digite o email cadastrado: ').strip()
+                if lembrar_senha(usuario, email) == True:
+                    sql = "select senha from login WHERE usuario = %s and email = %s"
+                    val = (usuario, email)
+                    mycursor.execute(sql, val)
+                    exibir_senha = mycursor.fetchall()
+                    for v in exibir_senha:
+                        for x in v:
+                            print(f'A Senha do usuario {usuario} é {x}')
+                    sleep(1.5)
+                    y = False
+                else:
+                    print('Dados invalidos !!')
+
+        elif opt == 4:
+            print()
+            print('VOLTE SEMPRE !! TCHAU !')
+            sleep(1.5)
+            sys.exit()
+
