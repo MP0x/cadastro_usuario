@@ -1,5 +1,5 @@
 import mysql.connector
-
+import time
 a = True
 print("Tentando acesso ao banco de dados: ", end='')
 while a:
@@ -11,6 +11,7 @@ while a:
         )
 
         print('\nConectado com sucesso')
+        time.sleep(3.0)
         a = False
     except:
         #print(f"NÃO FOI POSSIVEL CONECTAR AO BANCO DE DADOS !! VERIFIQUE XAAMP E MYSQL:")
