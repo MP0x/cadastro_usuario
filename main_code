@@ -1,6 +1,7 @@
 try:
     import mp3fundo
     from funcoes_cadastro import cadastrar, menu, alterar_idade, alterar_nome, exibir_lista, deletar_usuario
+    from funcoes_login import consulta_usuario
     from funcoes_login import consulta_usuario, criar_hash
     from time import sleep
     import os
@@ -8,8 +9,6 @@ try:
     os.system('cls')
     #mp3fundo.musica()
     #verificar_email("fran.cimargomes@hotmail.com")
-
-    #criar_hash()
 
     while consulta_usuario() == True:
         sleep(0.15)
@@ -32,6 +31,5 @@ try:
                 break
             else:
                 menu()
-
 except ImportError as erro:
     print(erro)
