@@ -1,7 +1,13 @@
-import pygame
+import time
+from pygame import mixer
 
-pygame.init()
-pygame.mixer.music.load('Thunder.mp3')
-pygame.mixer.music.play()
-#pygame.event.wait()
-input()
+def musica():
+    mixer.init()
+    mixer.music.load('Thunder.mp3')
+    mixer.music.play()
+    time.sleep(360)
+
+    mixer.init()
+    mixer.music.load('star_wars.mp3')
+    mixer.music.play()
+    time.sleep(360)
