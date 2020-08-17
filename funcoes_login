@@ -1,9 +1,13 @@
+import string
 import mysql.connector
+import smtplib
 from conecta_db import mydb
 import os
 import smtplib
 import sys
+import random
 from time import sleep
+import bcrypt
 
 mycursor = mydb.cursor()
 
@@ -46,15 +50,8 @@ def cadastrar_usuario():
         print()
         usuario = input('Digite o nome do usuário: '.title().strip())
         if verificar_usuario(usuario) == False:
-            b = True
-            while b:
-                email = input('Digite o seu email: ').strip()
 
-                if '@' in str(email):
-                    b = False
-                else:
-                    print('Isso não é um Email.')
-                    print('Digite um email válido !!')
+
 
             a = True
             while a:
@@ -66,22 +63,34 @@ def cadastrar_usuario():
                     senha2 = input('Digite novamente a senha: '.title().strip())
 
                     if senha1 == senha2:
+                        a = False
+                    else:
+                        print('Suas senhas estão diferentes !! ')
+                        print('Digite novamente a senha !')
+                h = True
+                while h:
+                    email = input('Digite o seu email: ').strip()
+                    codigo = validar_email(usuario, email)
+                    print(codigo)
+                    print('Verifique a sua caixa de email e spam.\n')
+
+                    codigo2 = input('Digite o codigo enviado por email: ').title().strip()
+
+                    if codigo == codigo2:
+                        print('O codigo esta certo')
                         sql = "INSERT INTO login (usuario, senha, email) VALUES (%s, %s, %s)"
                         val = (usuario, senha1, email)
                         mycursor.execute(sql, val)
                         mydb.commit()
                         os.system('cls')
                         print('Usuario Cadastrado com Sucesso !!')
-                        a = False
-                    else:
-                        print('Suas senhas estão diferentes !! ')
-                        print('Digite novamente a senha !')
+                        h = False
 
         else:
             print('Usuario já existe em nosso Banco de Dados !!')
             print('Favor digitar novamente.')
             cadastrar_usuario()
-        consulta_usuario()
+
     except ValueError as erro:
         print("Digite um valor valido.")
         cadastrar_usuario()
@@ -117,6 +126,7 @@ def consulta_usuario():
             ->   ''' ))
 
         if opt == 1:
+
             usuario = input('Digite o seu usuario [letra minuscula]: ').strip().lower()
             senha = input('Digite a sua senha: ').strip()
             if verificar_acesso(usuario, senha) == True:
@@ -124,11 +134,16 @@ def consulta_usuario():
                 print('               Acesso Concedido !!')
 
                 return True
+
             else:
                 print('Digite um usuario cadastrado!')
                 verificar_acesso()
+
         elif opt == 2:
+
             cadastrar_usuario()
+
+
         elif opt == 3:
             y = True
             while y:
@@ -139,9 +154,12 @@ def consulta_usuario():
                     val = (usuario, email)
                     mycursor.execute(sql, val)
                     exibir_senha = mycursor.fetchall()
-                    for v in exibir_senha:
-                        for x in v:
-                            print(f'A Senha do usuario {usuario} é {x}')
+                    #print(exibir_senha)
+                    enviar_email(usuario, email, exibir_senha[0][0])
+
+                    #print(f'A Senha do usuario {usuario} é {exibir_senha[0][0]}')
+
+
                     sleep(1.5)
                     y = False
                 else:
@@ -153,3 +171,59 @@ def consulta_usuario():
             sleep(1.5)
             sys.exit()
 
+
+def enviar_email(usuario, email, senha):
+    try:
+        msg = "Subject: Senha\nOla, " + usuario + ".\nSua senha e " + senha + "\nNao responda esse email."
+        smtplibObj = smtplib.SMTP("smtp.gmail.com", 587)
+        smtplibObj.ehlo()
+        smtplibObj.starttls()
+        smtplibObj.login("frangoc02@gmail.com", "mwzwyoicgstktuzo")
+        smtplibObj.sendmail("frangoc02@gmail.com", email , msg)
+        smtplibObj.quit()
+        print("O e-mail com a senha foi enviado com sucesso.")
+    except:
+        print("Erro ao tentar enviar e-mail para troca de senha!")
+
+def validar_email(usuario, email):
+
+    #codigo = random.randint(100000, 999999) Codigo so com numeros
+    codigo = "".join(random.choices(string.ascii_uppercase + string.digits, k=8))
+    try:
+        msg = "Subject: Codigo de acesso\nOla " + usuario + ".\nNumero para digitar no programa: " + codigo + "\nNao responda esse email."
+        smtplibObj = smtplib.SMTP("smtp.gmail.com", 587)
+        smtplibObj.ehlo()
+        smtplibObj.starttls()
+        smtplibObj.login("frangoc02@gmail.com", "mwzwyoicgstktuzo")
+        smtplibObj.sendmail("frangoc02@gmail.com", email , msg)
+        smtplibObj.quit()
+        print("O e-mail com a senha foi enviado com sucesso.")
+        return codigo
+    except:
+        print("Erro ao tentar enviar e-mail de validacao!")
+
+
+'''
+def criar_hash():
+    salt = bcrypt.gensalt()
+    hash_senha = bcrypt.hashpw('1234'.encode('utf-8'), salt)
+
+    print(salt)
+    print(hash_senha)
+
+    verificar_hash('1234'.encode('utf-8'), hash_senha)
+
+
+def verificar_hash(senha, hash_senha):
+    
+    if bcrypt.checkpw(senha, hash_senha):
+        print('foi')
+    else:
+        print('Nao foi')
+        
+'''
+
+
+
+
+#validar_email('leandro', 'lp.godoy@hotmail.com')
