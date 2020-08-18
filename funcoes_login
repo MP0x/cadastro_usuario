@@ -1,4 +1,4 @@
-# coding: utf-8
+#coding: utf-8
 import string
 import mysql.connector
 import smtplib
@@ -9,7 +9,7 @@ import sys
 import random
 from time import sleep
 import bcrypt
-
+from time import sleep
 mycursor = mydb.cursor()
 
 mycursor.execute('create database if not exists cadastro_usuario')
@@ -17,13 +17,12 @@ mycursor.execute('create database if not exists cadastro_usuario')
 mycursor.execute('use cadastro_usuario')
 
 mycursor.execute('create table if not exists login  (usuario varchar(20) primary key, '
-                 'senha varchar(30) not null, email varchar(55) not null)')
+                 'senha varchar(100) not null, email varchar(55) not null)')
 
 
 def verificar_acesso(usuario, senha):
     # mycursor = mydb.cursor()
     verificador = verificar_hash(usuario, senha)
-    print(verificador)
     if verificador == True:
         return True
     else:
@@ -82,7 +81,6 @@ def cadastrar_usuario():
                 while h:
                     email = input('Digite o seu email: ').strip()
                     codigo = validar_email(usuario, email)
-                    print(codigo)
                     print('Verifique a sua caixa de email e spam.\n')
                     codigo2 = input('Digite o codigo enviado por email: ').strip()
                     if codigo == codigo2:
@@ -119,67 +117,6 @@ def lembrar_senha(usuario, email):
         return True
     else:
         return False
-
-
-def consulta_usuario():
-    mycursor = mydb.cursor()
-    mycursor.execute('use cadastro_usuario')
-    while True:
-        print('=' * 50)
-        print('BEM VINDO AO SISTEMA'.center(50))
-        print('=' * 50)
-
-        opt = int(input(
-            '''         DIGITE A OPÇÃO DESEJADA:
-            [1] -> Acesso ao Banco de Dados.
-            [2] -> Cadastrar Usuario e Senha.
-            [3] -> Esqueci Minha Senha.
-            [4] -> Sair. 
-            ->   '''))
-
-        if opt == 1:
-
-            usuario = input('Digite o seu usuario [letra minuscula]: ').strip().lower()
-            senha = input('Digite a sua senha: ').strip()
-            if verificar_acesso(usuario, senha) == True:
-                os.system('cls')
-                print('               Acesso Concedido !!')
-
-                return True
-
-            else:
-                print('Digite um usuario cadastrado!')
-                verificar_acesso()
-
-        elif opt == 2:
-            cadastrar_usuario()
-
-
-        elif opt == 3:
-            y = True
-            while y:
-                usuario = input('Digite o seu usuario cadastrado [letra minuscula]: ').strip().lower()
-                email = input('Digite o email cadastrado: ').strip()
-                if lembrar_senha(usuario, email) == True:
-                    sql = "select senha from login WHERE usuario = %s and email = %s"
-                    val = (usuario, email)
-                    mycursor.execute(sql, val)
-                    exibir_senha = mycursor.fetchall()
-                    # print(exibir_senha)
-                    enviar_email(usuario, email, exibir_senha[0][0])
-
-                    # print(f'A Senha do usuario {usuario} é {exibir_senha[0][0]}')
-
-                    sleep(1.5)
-                    y = False
-                else:
-                    print('Dados invalidos !!')
-
-        elif opt == 4:
-            print()
-            print('VOLTE SEMPRE !! TCHAU !')
-            sleep(1.5)
-            sys.exit()
 
 
 def enviar_email(usuario, email, senha):
@@ -226,14 +163,116 @@ def verificar_hash(usuario, senha):
     val = (usuario,)
     mycursor.execute(sql, val)
     hash_senha = mycursor.fetchall()
-    hash_senha = hash_senha[0][0].encode('utf-8')
-    senha = senha.encode('utf-8')
-    print(f'{senha}    a senha em criptografada é , {hash_senha}')
-    if bcrypt.checkpw(senha, hash_senha):
-        a = False
-        return True
-    else:
-        print('Senha diferente! Digite novamente !')
-        return False
+    if len(hash_senha) != 0:
+        hash_senha = hash_senha[0][0].encode('utf-8')
+        senha = senha.encode('utf-8')
+
+        if bcrypt.checkpw(senha, hash_senha):
+            a = False
+            return True
+        else:
+            print('Senha diferente! Digite novamente !')
+            return False
+
+    return False
 
 # validar_email('leandro', 'lp.godoy@hotmail.com')
+
+
+
+
+
+
+def consulta_usuario():
+    mycursor = mydb.cursor()
+    mycursor.execute('use cadastro_usuario')
+    while True:
+        print('=' * 50)
+        print('BEM VINDO AO SISTEMA'.center(50))
+        print('=' * 50)
+
+        opt = int(input(
+            '''         DIGITE A OPÇÃO DESEJADA:
+            [1] -> Acesso ao Banco de Dados.
+            [2] -> Cadastrar Usuario e Senha.
+            [3] -> Esqueci Minha Senha.
+            [4] -> Sair. 
+            ->   '''))
+
+        if opt == 1:
+
+            usuario = input('Digite o seu usuario [letra minuscula]: ').strip().lower()
+            senha = input('Digite a sua senha: ').strip()
+            if verificar_acesso(usuario, senha) == True:
+                os.system('cls')
+                print('               Acesso Concedido !!')
+                sleep(2.0)
+                return True
+
+            else:
+                print('Usuario Invalido !! Digite um usuario cadastrado !!')
+                sleep(2.0)
+                #verificar_acesso()
+
+        elif opt == 2:
+            cadastrar_usuario()
+
+
+        elif opt == 3:
+            y = True
+            while y:
+                usuario = input('Digite o seu usuario cadastrado [letra minuscula]: ').strip().lower()
+                email = input('Digite o email cadastrado: ').strip()
+                if lembrar_senha(usuario, email) == True:
+                    #sql = "select senha from login WHERE usuario = %s and email = %s"
+                    #val = (usuario, email)
+                    #mycursor.execute(sql, val)
+                    #exibir_senha = mycursor.fetchall()
+                    # print(exibir_senha)
+                    codigo3 = validar_email(usuario, email)
+                    print('Verifique a sua caixa de email e spam.\n')
+                    codigo4 = input('Digite o codigo enviado por email: ').strip()
+
+                    if codigo3 == codigo4:
+                        print('O codigo esta certo')
+                        a = True
+                        while a:
+                            senha1 = input('Digite a nova senha: '.title()).strip()
+
+                            if len(senha1) < 8:
+                                print('DIGITE UMA SENHA COM NO MINIMO 8 CARACTERES.')
+                            else:
+                                senha2 = input('Digite novamente a nova senha: '.title()).strip()
+
+                                if senha1 == senha2:
+                                    cript_senha = criar_hash(senha1)
+
+                                    a = False
+                                else:
+                                    print('Suas senhas estão diferentes !! ')
+                                    print('Digite novamente a senha !')
+                        sql = "UPDATE login SET senha = %s WHERE usuario = %s"
+                        val = (cript_senha, usuario)
+                        mycursor.execute(sql, val)
+                        mydb.commit()
+                        os.system('cls')
+                        print('Senha Alterada com Sucesso !!')
+                        h = False
+                    else:
+                        print('Digite o código valido !')
+
+                    # print(f'A Senha do usuario {usuario} é {exibir_senha[0][0]}')
+
+                    sleep(1.5)
+                    y = False
+                else:
+                    print('Dados invalidos !!')
+
+        elif opt == 4:
+            print()
+            print('VOLTE SEMPRE !! TCHAU !')
+            sleep(1.5)
+            sys.exit()
+
+
+
