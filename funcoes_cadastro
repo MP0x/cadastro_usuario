@@ -75,13 +75,13 @@ try:
 
 
     #Guarda os logos de erros do sistema
-    def log():
+    def log(args = 'sem erro'):
 
         try:
             sistema = platform.architecture()
             arquivo = open('log.txt', 'a')
             data = str(date.today())
-            dados = '\n' + os.getlogin() + '  ' + data + '  ' + sistema[0] + '  ' + sistema[1]
+            dados = args + '\n' + os.getlogin() + '  ' + data + '  ' + sistema[0] + '  ' + sistema[1]
             arquivo.write(f" {dados}")
             arquivo.close()
         except:
